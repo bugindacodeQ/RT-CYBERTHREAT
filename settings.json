@@ -1,0 +1,8 @@
+{
+    "python.terminal.useEnvFile": true
+}
+
+{
+    "python.defaultInterpreterPath": "python",
+    "python.terminal.useEnvFile": true
+}
