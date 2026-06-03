@@ -13,7 +13,7 @@ RUN mkdir -p models data/raw data/processed
 RUN echo "Generating synthetic data..." && python src/data_generation.py && \
     echo "Preprocessing data..." && python src/preprocess.py && \
     echo "Training model..." && python src/train.py && \
-    echo "✅ Model training completed successfully!"
+    echo "Model training completed successfully!"
 
 EXPOSE 8000
 
