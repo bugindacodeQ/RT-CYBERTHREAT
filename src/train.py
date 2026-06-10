@@ -6,6 +6,8 @@ from sklearn.metrics import (
     roc_auc_score, accuracy_score, precision_score, recall_score
 )
 import joblib
+import json
+import os
 from preprocess import load_and_preprocess
 
 
@@ -31,7 +33,20 @@ def evaluate_model(model, X_test, y_test, name):
     print(f"    FN={cm[1][0]}  TP={cm[1][1]}")
     print(f"\n  Classification Report:\n{classification_report(y_test, y_pred)}")
 
-    return {"name": name, "model": model, "accuracy": acc, "precision": prec, "recall": rec, "auc": auc}
+    return {
+        "name": name,
+        "model": model,
+        "accuracy": round(acc, 4),
+        "precision": round(prec, 4),
+        "recall": round(rec, 4),
+        "roc_auc": round(auc, 4),
+        "confusion_matrix": {
+            "TN": int(cm[0][0]),
+            "FP": int(cm[0][1]),
+            "FN": int(cm[1][0]),
+            "TP": int(cm[1][1]),
+        },
+    }
 
 
 def train_model():
@@ -71,6 +86,19 @@ def train_model():
     print(f"{'*'*45}")
     joblib.dump(best["model"], "models/best_model.pkl")
     print(f"  Saved to models/best_model.pkl")
+
+    # Save metrics for the API/dashboard
+    metrics_payload = {
+        "best_model": best["name"],
+        "models": [
+            {k: v for k, v in r.items() if k != "model"}
+            for r in results
+        ],
+    }
+    os.makedirs("models", exist_ok=True)
+    with open("models/metrics.json", "w") as f:
+        json.dump(metrics_payload, f, indent=2)
+    print("  Metrics saved to models/metrics.json")
 
     return best["model"]
 
